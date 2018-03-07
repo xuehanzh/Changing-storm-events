@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>INF-554 Project</title>
+        <meta charset="utf-8">
+    <style> /* set the CSS */
+    .title { font-family: sans-serif;
+             font-size: 16px;
+             font-weight: bold; }
+    .label { font-family: sans-serif;
+             font-size: 11px;
+             text-align: center;
+             font-weight: bold; }
+    .slopeLabel { font-size: 11px;
+                  font-family: sans-serif; }
+    .bar { fill: maroon; }
+    .line {
+            stroke-width:3; }
+    </style>
+        <script src="http://d3js.org/d3.v4.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.0/d3-legend.min.js"></script>
+  </head>
+  <body>
+        <h1 style="font-family: sans-serif">INF-554 Project</h1>
+        <button id= "occurance">Occurance</button>
+        <button id= "damage">Damage</button>
+        <button id= "death">Deaths</button>
+        <button id= "injury">Injuries</button>
+        <script type="text/javascript">
+        format = d3.format(",");
+        function createTitle(text){
+            d3.select("body")
+              .append("p")
+              .attr("class", "title")
+              .text(text)
+        }
+        function createSVG(width, height, left_margin, right_margin, top_margin, bottom_margin){
+        var svg = d3.select("body")
+                    .append("svg")
+                    .attr("width", width + left_margin + right_margin)
+                    .attr("height", height + top_margin + bottom_margin)
+                    .append("g")
+                    .attr("transform", "translate(" + left_margin + "," + top_margin + ")")
+        return svg
+        }
+        function createSVGelement(svg, element, data){
+        var element = svg.selectAll("whatever")
+                         .data(data)
+                         .enter()
+                         .append(element)
+        return element
+        }
+        function createSlopeLabel(svg, text, side, width){
+        var text = svg.append("text")
+                      .text(text)
+                      .attr("class", "label")
+        if(side == "left"){ text.attr("x", (width/4 - 75)) }
+        if(side == "right"){ text.attr("x", ((width * 3)/4) + 75) }
+                  text.attr("y", -12);
+        }
+        function createSlopeGraph(data){
+        var margin = {top: 20, right: 20, bottom: 50, left: 75},
+            width = 750 - margin.left - margin.right,
+            height = 1000 - margin.top - margin.bottom;
+        y1 = d3.scaleLinear()
+                   .domain([0, d3.max(data, function(d) { return d.COUNT_2016; })])
+                   .range([height, 0]);
+        svg = createSVG(width, height, margin.left, margin.right, margin.top, margin.bottom);
+        var color = d3.scaleOrdinal()
+                      .domain(["Hurricane", "Wildfire", "Excessive Heat", "Tropical Storm", "All Events"])
+                      .range(["#00345b", "#f89921", "#8b1918", "#40817b", "#330033"]);
+        var legendOrdinal = d3.legendColor()
+                              .shape("path", d3.symbol().type(d3.symbolCircle).size(150)())
+                              .shapePadding(10)
+                              .scale(color);
+        svg.append("g")
+           .attr("class", "legend")
+           .attr("transform", "translate(20,20)");
+        svg.select(".legend")
+           .call(legendOrdinal);
+        element = createSVGelement(svg, "line", data)
+        element.attr("class", "line")
+               .attr("x1", (width/4))
+               .attr("y1", function(d) { return y1(d.COUNT_1996); })
+               .attr("x2", ((width * 3)/4))
+               .attr("y2", function(d) { return y1(d.COUNT_2016); })
+               .attr("stroke", function(d) { return color(d.TYPE)});
+        element = createSVGelement(svg, "text", data)
+        element.text(function(d){ return format(d.COUNT_1996); })
+               .attr("x", (width/4) - 50)
+               .attr("y", function(d) {return y1(d.COUNT_1996); })
+               .attr("class", "slopeLabel left");
+        element = createSVGelement(svg, "text", data)
+        element.text(function(d){ return format(d.COUNT_2016); })
+               .attr("x", ((width * 3)/4) + 50)
+               .attr("y", function(d) {return y1(d.COUNT_2016); })
+               .attr("class", "slopeLabel right");
+        // element = createSVGelement(svg, "text", data)
+        // element.text(function(d){ return d.TYPE; })
+        //        .attr("x", (width/4) - 100)
+        //        .attr("y", function(d) {return y1(d.COUNT_1996); })
+        //        .attr("class", "slopeLabel");
+        // element = createSVGelement(svg, "text", data)
+        // element.text(function(d){ return d.TYPE; })
+        //        .attr("x", ((width * 3)/4) + 100)
+        //        .attr("y", function(d) {return y1(d.COUNT_2016); })
+        //        .attr("class", "slopeLabel");
+        createSlopeLabel(svg, "1996", "left", width)
+        createSlopeLabel(svg, "2016", "right", width);
+        };
+        d3.json("slope_graph_data.json", function(data) {
+        console.log(data);
+        createTitle("Slope Graph of Change in Weather Events from 1996 to 2016")
+        createSlopeGraph(data);
+        d3.select("#damage")
+          .on("click", function() {
+         y1.domain([0, d3.max(data, function(d) { return d.DAMAGE_2016; })]);
+         svg.selectAll("line")
+            .data(data)
+            .transition()
+            .delay(function(d, i) { return i * 75; })
+            .duration(500)
+            .attr("y1", function(d) { return y1(d.DAMAGE_1996); })
+            .attr("y2", function(d) { return y1(d.DAMAGE_2016); });
+        svg.selectAll(".left")
+           .data(data)
+           .transition()
+           .delay(function(d, i) { return i * 75; })
+           .duration(500)
+           .text(function(d){ return "$" + format(d.DAMAGE_1996); })
+           .attr("y", function(d) { return y1(d.DAMAGE_1996); });
+       svg.selectAll(".right")
+          .data(data)
+          .transition()
+          .delay(function(d, i) { return i * 75; })
+          .duration(500)
+          .text(function(d){ return "$" + format(d.DAMAGE_2016); })
+          .attr("y", function(d) { return y1(d.DAMAGE_2016); });
+       });
+       d3.select("#occurance")
+         .on("click", function() {
+        y1.domain([0, d3.max(data, function(d) { return d.COUNT_2016; })]);
+        svg.selectAll("line")
+           .data(data)
+           .transition()
+           .delay(function(d, i) { return i * 75; })
+           .duration(500)
+           .attr("y1", function(d) { return y1(d.COUNT_1996); })
+           .attr("y2", function(d) { return y1(d.COUNT_2016); });
+       svg.selectAll(".left")
+          .data(data)
+          .transition()
+          .delay(function(d, i) { return i * 75; })
+          .duration(500)
+          .text(function(d){ return format(d.COUNT_1996); })
+          .attr("y", function(d) { return y1(d.COUNT_1996); });
+      svg.selectAll(".right")
+         .data(data)
+         .transition()
+         .delay(function(d, i) { return i * 75; })
+         .duration(500)
+         .text(function(d){ return format(d.COUNT_2016); })
+         .attr("y", function(d) { return y1(d.COUNT_2016); });
+      });
+      d3.select("#death")
+        .on("click", function() {
+       y1.domain([0, d3.max(data, function(d) { return d.DEATH_2016; })]);
+       svg.selectAll("line")
+          .data(data)
+          .transition()
+          .delay(function(d, i) { return i * 75; })
+          .duration(500)
+          .attr("y1", function(d) { return y1(d.DEATH_1996); })
+          .attr("y2", function(d) { return y1(d.DEATH_2016); });
+      svg.selectAll(".left")
+         .data(data)
+         .transition()
+         .delay(function(d, i) { return i * 75; })
+         .duration(500)
+         .text(function(d){ return format(d.DEATH_1996); })
+         .attr("y", function(d) { return y1(d.DEATH_1996); });
+     svg.selectAll(".right")
+        .data(data)
+        .transition()
+        .delay(function(d, i) { return i * 75; })
+        .duration(500)
+        .text(function(d){ return format(d.DEATH_2016); })
+        .attr("y", function(d) { return y1(d.DEATH_2016); });
+     });
+     d3.select("#injury")
+       .on("click", function() {
+      y1.domain([0, d3.max(data, function(d) { return d.INJURY_2016; })]);
+      svg.selectAll("line")
+         .data(data)
+         .transition()
+         .delay(function(d, i) { return i * 75; })
+         .duration(500)
+         .attr("y1", function(d) { return y1(d.INJURY_1996); })
+         .attr("y2", function(d) { return y1(d.INJURY_2016); });
+     svg.selectAll(".left")
+        .data(data)
+        .transition()
+        .delay(function(d, i) { return i * 75; })
+        .duration(500)
+        .text(function(d){ return format(d.INJURY_1996); })
+        .attr("y", function(d) { return y1(d.INJURY_1996); });
+    svg.selectAll(".right")
+       .data(data)
+       .transition()
+       .delay(function(d, i) { return i * 75; })
+       .duration(500)
+       .text(function(d){ return format(d.INJURY_2016); })
+       .attr("y", function(d) { return y1(d.INJURY_2016); });
+    });
+    });
+    </script>
+  </body>
+</html>

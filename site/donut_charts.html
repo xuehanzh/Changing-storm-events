@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>Storm Events Portal</title>
+        <script src="http://d3js.org/d3.v4.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+
+        <!-- <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"> -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.0/d3-legend.min.js"></script>
+        <link rel="stylesheet" href="css/style.css">
+
+        <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+
+        <style>
+        body{font-family: sans-serif;}
+        #div{display: inline-block;}
+        .label{font-family: sans-serif;
+               font-size: 11px;
+               text-align: center;
+               font-weight: bold; }
+        .pieYear{font-family: sans-serif;
+                 text-anchor: middle;
+                 font-size: 14px}
+        </style>
+    </head>
+    <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">Storm Events Home</a>
+            <a class="navbar-brand" href="donut_charts.html">Event Intensity</a>
+            <a class="navbar-brand" href="slope-graph.html">Event Frequency</a>
+            <a class="navbar-brand" href="choropleth.html">Event Geography</a>
+            <a class="navbar-brand" href='stream-graphs.html'>Regional Event Impact</a>
+
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+        </div>
+    </nav>
+<br/>
+
+        <!-- <h1>Incidence of Weather Events by Year</h1> -->
+        <div class="row md-12">
+<div class="col-md-2">
+        <h3 class="my-3">Changing Proportion of Storm Event Attribution</h3>
+        <div id= "chart">
+        </div>
+      </br>
+        <p>While we may not be able to detect a clear increasing trend in storm event frequency and intensity, the percentage of damage, fatalities, and injuries caused by different storm events may not be consistent across time.</p>
+
+</div>
+        <div class="col-md-10 text-center">
+        <div class="btn-group" role="group" aria-label="Basic example">
+            <button id= "occurance" class="donut-button">Occurances</button>
+            <button id= "damage" class="donut-button">Property Damage</button>
+            <button id= "death" class="donut-button">Fatalities</button>
+            <button id= "injury" class="donut-button">Injuries</button>
+        </div>
+      </br> </br>
+      </div>
+</div>
+<p>The donut charts above indicate that there is an increasing number of excessive heat events, and a corresponding increasing percentage of fatalities and injuries are attributed to excessive heat. Most property damage is attributed to wildfires across the sampled years.</p>
+
+        <!-- <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Select a Storm Variable
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <a class="dropdown-item occurance" href="#">Storm Frequency</a>
+          <a class="dropdown-item damage" href="#">Property Damage</a>
+          <a class="dropdown-item death" href="#">Fatalities</a>
+          <a class="dropdown-item injury" href="#">Injuries</a>
+        </div>
+</div> -->
+      <!-- </br> -->
+
+      <!-- </br> -->
+        <script type="text/javascript">
+         d3.json("data/pie_data_all.json",function(data){
+            console.log(data);
+            var w = 200;
+            var h = 100;
+            var legend_svg = d3.select("#chart")
+                               .append("svg")
+                               .attr("width", w)
+                               .attr("height", h);
+            var color = d3.scaleOrdinal()
+                          .domain(["Hurricane", "Wildfire", "Excessive Heat", "Tropical Storm"])
+                          .range(["#00345b", "#f89921", "#8b1918", "#40817b"]);
+            var legendOrdinal = d3.legendColor()
+                                  .shape("path", d3.symbol().type(d3.symbolCircle).size(150)())
+                                  .shapePadding(10)
+                                  .scale(color);
+            legend_svg.append("g")
+                      .attr("class", "legend")
+                      .attr("transform", "translate(20,20)");
+            legend_svg.select(".legend")
+                      .call(legendOrdinal);
+            d3.select("body")
+              .append("br");
+            var svg1998 = d3.select(".col-md-10")
+                            .append("svg")
+                            .attr("width", w)
+                            .attr("height", w);
+            var pie1998 = d3.pie()
+                            .value(function(d) { return d.X1998Occurance; } )
+                            (data);
+            var piedeath1998 = d3.pie()
+        		                     .value(function(d) { return d.X1998Death; })(data);
+            var pieinjury1998 = d3.pie()
+       		                        .value(function(d) { return d.X1998Injury; })(data);
+            var piedamage1998 = d3.pie()
+       		                        .value(function(d) { return d.X1998Damage; })(data);
+            svg1998.append("text")
+                   .attr("x", "100")
+                   .attr("y", "100")
+                   .attr("class", "pieYear")
+                   .text("1998");
+            // createPieChart(data, w, svg1998, pie1998, piedeath1998, pieinjury1998, piedamage1998);
+            var outerRadius = w / 2;
+            var innerRadius = w / 3;
+            arc = d3.arc()
+                        .innerRadius(innerRadius)
+                        .outerRadius(outerRadius);
+            var arcs1998 = svg1998.selectAll("g.arc")
+                          .data(pie1998)
+                          .enter()
+                          .append("g")
+                          .attr("class", "arc")
+                          .attr("transform", "translate(" + outerRadius + ", " + outerRadius + ")");
+            arcs1998.append("path")
+                .attr("fill", function(d, i) { return color(i); })
+                .attr("d", arc)
+                .each(function(d) { this._current = d; });
+
+
+            var svg2000 = d3.select(".col-md-10")
+                            .append("svg")
+                            .attr("width", w)
+                            .attr("height", w);
+            var pie2000 = d3.pie()
+                            .value(function(d) { return d.X2000Occurance; } )
+                            (data);
+            var piedeath2000 = d3.pie()
+                                 .value(function(d) { return d.X2000Death; })(data);
+            var pieinjury2000 = d3.pie()
+                                  .value(function(d) { return d.X2000Injury; })(data);
+            var piedamage2000 = d3.pie()
+                                  .value(function(d) { return d.X2000Damage; })(data);
+            svg2000.append("text")
+                   .attr("x", "100")
+                   .attr("y", "100")
+                   .attr("class", "pieYear")
+                   .text("2000");
+           var arcs2000 = svg2000.selectAll("g.arc")
+                         .data(pie2000)
+                         .enter()
+                         .append("g")
+                         .attr("class", "arc")
+                         .attr("transform", "translate(" + outerRadius + ", " + outerRadius + ")");
+           arcs2000.append("path")
+               .attr("fill", function(d, i) { return color(i); })
+               .attr("d", arc)
+               .each(function(d) { this._current = d; });
+
+
+
+
+            var svg2002 = d3.select(".col-md-10")
+                            .append("svg")
+                            .attr("width", w)
+                            .attr("height", w);
+            var pie2002 = d3.pie()
+                            .value(function(d) { return d.X2002Occurance; } )
+                            (data);
+            var piedeath2002 = d3.pie()
+                                 .value(function(d) { return d.X2002Death; })(data);
+            var pieinjury2002 = d3.pie()
+                                  .value(function(d) { return d.X2002Injury; })(data);
+            var piedamage2002 = d3.pie()
+                                  .value(function(d) { return d.X2002Damage; })(data);
+            svg2002.append("text")
+                   .attr("x", "100")
+                   .attr("y", "100")
+                   .attr("class", "pieYear")
+                   .text("2002");
+            var arcs2002 = svg2002.selectAll("g.arc")
+                           .data(pie2002)
+                           .enter()
+                           .append("g")
+                           .attr("class", "arc")
+                           .attr("transform", "translate(" + outerRadius + ", " + outerRadius + ")");
+             arcs2002.append("path")
+                     .attr("fill", function(d, i) { return color(i); })
+                     .attr("d", arc)
+                     .each(function(d) { this._current = d; });
+
+
+            var svg2004 = d3.select(".col-md-10")
+                            .append("svg")
+                            .attr("width", w)
+                            .attr("height", w);
+            var pie2004 = d3.pie()
+                            .value(function(d) { return d.X2004Occurance; } )
+                            (data);
+            var piedeath2004 = d3.pie()
+                                 .value(function(d) { return d.X2004Death; })(data);
+            var pieinjury2004 = d3.pie()
+                                  .value(function(d) { return d.X2004Injury; })(data);
+            var piedamage2004 = d3.pie()
+                                  .value(function(d) { return d.X2004Damage; })(data);
+            svg2004.append("text")
+                   .attr("x", "100")
+                   .attr("y", "100")
+                   .attr("class", "pieYear")
+                   .text("2004");
+            var arcs2004 = svg2004.selectAll("g.arc")
+                                  .data(pie2004)
+                                  .enter()
+                                  .append("g")
+                                  .attr("class", "arc")
+                                  .attr("transform", "translate(" + outerRadius + ", " + outerRadius + ")");
+             arcs2004.append("path")
+                    .attr("fill", function(d, i) { return color(i); })
+                    .attr("d", arc)
+                    .each(function(d) { this._current = d; });
+
+            var svg2006 = d3.select(".col-md-10")
+                            .append("svg")
+                            .attr("width", w)
+                            .attr("height", w);
+            var pie2006 = d3.pie()
+                            .value(function(d) { return d.X2006Occurance; } )
+                            (data);
+            var piedeath2006 = d3.pie()
+                                 .value(function(d) { return d.X2006Death; })(data);
+            var pieinjury2006 = d3.pie()
+                                  .value(function(d) { return d.X2006Injury; })(data);
+            var piedamage2006 = d3.pie()
+                                  .value(function(d) { return d.X2006Damage; })(data);
+            svg2006.append("text")
+                   .attr("x", "100")
+                   .attr("y", "100")
+                   .attr("class", "pieYear")
+                   .text("2006");
+            var arcs2006 = svg2006.selectAll("g.arc")
+                                  .data(pie2006)
+                                  .enter()
+                                  .append("g")
+                                  .attr("class", "arc")
+                                  .attr("transform", "translate(" + outerRadius + ", " + outerRadius + ")");
+             arcs2006.append("path")
+                     .attr("fill", function(d, i) { return color(i); })
+                     .attr("d", arc)
+                     .each(function(d) { this._current = d; });
+
+            d3.select("body")
+              .append("br");
+
+            var svg2008 = d3.select(".col-md-10")
+                            .append("svg")
+                            .attr("width", w)
+                            .attr("height", w);
+            var pie2008 = d3.pie()
+                            .value(function(d) { return d.X2008Occurance; } )
+                            (data);
+            var piedeath2008 = d3.pie()
+                                 .value(function(d) { return d.X2008Death; })(data);
+            var pieinjury2008 = d3.pie()
+                                  .value(function(d) { return d.X2008Injury; })(data);
+            var piedamage2008 = d3.pie()
+                                  .value(function(d) { return d.X2008Damage; })(data);
+            svg2008.append("text")
+                   .attr("x", "100")
+                   .attr("y", "100")
+                   .attr("class", "pieYear")
+                   .text("2008");
+            var arcs2008 = svg2008.selectAll("g.arc")
+                                  .data(pie2008)
+                                  .enter()
+                                  .append("g")
+                                  .attr("class", "arc")
+                                  .attr("transform", "translate(" + outerRadius + ", " + outerRadius + ")");
+             arcs2008.append("path")
+                     .attr("fill", function(d, i) { return color(i); })
+                     .attr("d", arc)
+                     .each(function(d) { this._current = d; });
+
+            var svg2010 = d3.select(".col-md-10")
+                            .append("svg")
+                            .attr("width", w)
+                            .attr("height", w);
+            var pie2010 = d3.pie()
+                            .value(function(d) { return d.X2010Occurance; })(data);
+            var piedeath2010 = d3.pie()
+                                 .value(function(d) { return d.X2010Death; })(data);
+            var pieinjury2010 = d3.pie()
+                                  .value(function(d) { return d.X2010Injury; })(data);
+            var piedamage2010 = d3.pie()
+                                  .value(function(d) { return d.X2010Damage; })(data);
+            svg2010.append("text")
+                   .attr("x", "100")
+                   .attr("y", "100")
+                   .attr("class", "pieYear")
+                   .text("2010");
+            var arcs2010 = svg2010.selectAll("g.arc")
+                                  .data(pie2010)
+                                  .enter()
+                                  .append("g")
+                                  .attr("class", "arc")
+                                  .attr("transform", "translate(" + outerRadius + ", " + outerRadius + ")");
+             arcs2010.append("path")
+                     .attr("fill", function(d, i) { return color(i); })
+                     .attr("d", arc)
+                     .each(function(d) { this._current = d; });
+
+            var svg2012 = d3.select(".col-md-10")
+                            .append("svg")
+                            .attr("width", w)
+                            .attr("height", w);
+            var pie2012 = d3.pie()
+                            .value(function(d) { return d.X2012Occurance; } )
+                            (data);
+            var piedeath2012 = d3.pie()
+                                 .value(function(d) { return d.X2012Death; })(data);
+            var pieinjury2012 = d3.pie()
+                                  .value(function(d) { return d.X2012Injury; })(data);
+            var piedamage2012 = d3.pie()
+                                  .value(function(d) { return d.X2012Damage; })(data);
+            svg2012.append("text")
+                   .attr("x", "100")
+                   .attr("y", "100")
+                   .attr("class", "pieYear")
+                   .text("2012");
+            var arcs2012 = svg2012.selectAll("g.arc")
+                                  .data(pie2012)
+                                  .enter()
+                                  .append("g")
+                                  .attr("class", "arc")
+                                  .attr("transform", "translate(" + outerRadius + ", " + outerRadius + ")");
+             arcs2012.append("path")
+                     .attr("fill", function(d, i) { return color(i); })
+                     .attr("d", arc)
+                     .each(function(d) { this._current = d; });
+
+            var svg2014 = d3.select(".col-md-10")
+                            .append("svg")
+                            .attr("width", w)
+                            .attr("height", w);
+            var pie2014 = d3.pie()
+                            .value(function(d) { return d.X2014Occurance; })(data);
+            var piedeath2014 = d3.pie()
+                                 .value(function(d) { return d.X2014Death; })(data);
+            var pieinjury2014 = d3.pie()
+                                  .value(function(d) { return d.X2014Injury; })(data);
+            var piedamage2014 = d3.pie()
+                                  .value(function(d) { return d.X2014Damage; })(data);
+            svg2014.append("text")
+                   .attr("x", "100")
+                   .attr("y", "100")
+                   .attr("class", "pieYear")
+                   .text("2014");
+           var arcs2014 = svg2014.selectAll("g.arc")
+                                 .data(pie2014)
+                                 .enter()
+                                 .append("g")
+                                 .attr("class", "arc")
+                                 .attr("transform", "translate(" + outerRadius + ", " + outerRadius + ")");
+            arcs2014.append("path")
+                    .attr("fill", function(d, i) { return color(i); })
+                    .attr("d", arc)
+                    .each(function(d) { this._current = d; });
+
+            var svg2016 = d3.select(".col-md-10")
+                            .append("svg")
+                            .attr("width", w)
+                            .attr("height", w);
+            var pie2016 = d3.pie()
+                            .value(function(d) { return d.X2016Occurance; })(data);
+            var piedeath2016 = d3.pie()
+                                 .value(function(d) { return d.X2016Death; })(data);
+            var pieinjury2016 = d3.pie()
+                                  .value(function(d) { return d.X2016Injury; })(data);
+            var piedamage2016 = d3.pie()
+                                  .value(function(d) { return d.X2016Damage; })(data);
+            svg2016.append("text")
+                   .attr("x", "100")
+                   .attr("y", "100")
+                   .attr("class", "pieYear")
+                   .text("2016");
+            var arcs2016 = svg2016.selectAll("g.arc")
+                                  .data(pie2016)
+                                  .enter()
+                                  .append("g")
+                                  .attr("class", "arc")
+                                  .attr("transform", "translate(" + outerRadius + ", " + outerRadius + ")");
+             arcs2016.append("path")
+                     .attr("fill", function(d, i) { return color(i); })
+                     .attr("d", arc)
+                     .each(function(d) { this._current = d; });
+
+             d3.select("#occurance")
+               .on("click", function() {
+               path1998 = svg1998.selectAll("g.arc")
+                         .select("path")
+                         .data(pie1998);
+               path1998.transition()
+                       .duration(1000)
+                       .attrTween("d", arcTween);
+               path2000 = svg2000.selectAll("g.arc")
+                                 .select("path")
+                                 .data(pie2000);
+               path2000.transition()
+                       .duration(1000)
+                       .attrTween("d", arcTween);
+               path2002 = svg2002.selectAll("g.arc")
+                                 .select("path")
+                                 .data(pie2002);
+               path2002.transition()
+                       .duration(1000)
+                       .attrTween("d", arcTween);
+               path2004 = svg2004.selectAll("g.arc")
+                                 .select("path")
+                                 .data(pie2004);
+               path2004.transition()
+                       .duration(1000)
+                       .attrTween("d", arcTween);
+               path2006 = svg2006.selectAll("g.arc")
+                                 .select("path")
+                                 .data(pie2006);
+               path2006.transition()
+                       .duration(1000)
+                       .attrTween("d", arcTween);
+               path2008 = svg2008.selectAll("g.arc")
+                                 .select("path")
+                                 .data(pie2008);
+               path2008.transition()
+                       .duration(1000)
+                       .attrTween("d", arcTween);
+               path2010 = svg2010.selectAll("g.arc")
+                                 .select("path")
+                                 .data(pie2010);
+               path2010.transition()
+                       .duration(1000)
+                       .attrTween("d", arcTween);
+               path2012 = svg2012.selectAll("g.arc")
+                                 .select("path")
+                                 .data(pie2012);
+               path2012.transition()
+                       .duration(1000)
+                       .attrTween("d", arcTween);
+               path2014 = svg2014.selectAll("g.arc")
+                                 .select("path")
+                                 .data(pie2014);
+               path2014.transition()
+                       .duration(1000)
+                       .attrTween("d", arcTween);
+               path2016 = svg2016.selectAll("g.arc")
+                                 .select("path")
+                                 .data(pie2016);
+               path2016.transition()
+                       .duration(1000)
+                       .attrTween("d", arcTween);
+             })
+
+             d3.select("#damage")
+               .on("click", function() {
+               path1998 = svg1998.selectAll("g.arc")
+                         .select("path")
+                         .data(piedamage1998);
+               path1998.transition()
+                       .duration(1000)
+                       .attrTween("d", arcTween);
+               path2000 = svg2000.selectAll("g.arc")
+                                 .select("path")
+                                 .data(piedamage2000);
+               path2000.transition()
+                       .duration(1000)
+                       .attrTween("d", arcTween);
+               path2002 = svg2002.selectAll("g.arc")
+                                 .select("path")
+                                 .data(piedamage2002);
+               path2002.transition()
+                       .duration(1000)
+                       .attrTween("d", arcTween);
+               path2004 = svg2004.selectAll("g.arc")
+                                 .select("path")
+                                 .data(piedamage2004);
+               path2004.transition()
+                       .duration(1000)
+                       .attrTween("d", arcTween);
+               path2006 = svg2006.selectAll("g.arc")
+                                 .select("path")
+                                 .data(piedamage2006);
+               path2006.transition()
+                       .duration(1000)
+                       .attrTween("d", arcTween);
+               path2008 = svg2008.selectAll("g.arc")
+                                 .select("path")
+                                 .data(piedamage2008);
+               path2008.transition()
+                       .duration(1000)
+                       .attrTween("d", arcTween);
+               path2010 = svg2010.selectAll("g.arc")
+                                 .select("path")
+                                 .data(piedamage2010);
+               path2010.transition()
+                       .duration(1000)
+                       .attrTween("d", arcTween);
+               path2012 = svg2012.selectAll("g.arc")
+                                 .select("path")
+                                 .data(piedamage2012);
+               path2012.transition()
+                       .duration(1000)
+                       .attrTween("d", arcTween);
+               path2014 = svg2014.selectAll("g.arc")
+                                 .select("path")
+                                 .data(piedamage2014);
+               path2014.transition()
+                       .duration(1000)
+                       .attrTween("d", arcTween);
+               path2016 = svg2016.selectAll("g.arc")
+                                 .select("path")
+                                 .data(piedamage2016);
+               path2016.transition()
+                       .duration(1000)
+                       .attrTween("d", arcTween);
+             })
+
+          d3.select("#death")
+            .on("click", function() {
+            path1998 = svg1998.selectAll("g.arc")
+                      .select("path")
+                      .data(piedeath1998);
+            path1998.transition()
+                    .duration(1000)
+                    .attrTween("d", arcTween);
+            path2000 = svg2000.selectAll("g.arc")
+                              .select("path")
+                              .data(piedeath2000);
+            path2000.transition()
+                    .duration(1000)
+                    .attrTween("d", arcTween);
+            path2002 = svg2002.selectAll("g.arc")
+                              .select("path")
+                              .data(piedeath2002);
+            path2002.transition()
+                    .duration(1000)
+                    .attrTween("d", arcTween);
+            path2004 = svg2004.selectAll("g.arc")
+                              .select("path")
+                              .data(piedeath2004);
+            path2004.transition()
+                    .duration(1000)
+                    .attrTween("d", arcTween);
+            path2006 = svg2006.selectAll("g.arc")
+                              .select("path")
+                              .data(piedeath2006);
+            path2006.transition()
+                    .duration(1000)
+                    .attrTween("d", arcTween);
+            path2008 = svg2008.selectAll("g.arc")
+                              .select("path")
+                              .data(piedeath2008);
+            path2008.transition()
+                    .duration(1000)
+                    .attrTween("d", arcTween);
+            path2010 = svg2010.selectAll("g.arc")
+                              .select("path")
+                              .data(piedeath2010);
+            path2010.transition()
+                    .duration(1000)
+                    .attrTween("d", arcTween);
+            path2012 = svg2012.selectAll("g.arc")
+                              .select("path")
+                              .data(piedeath2012);
+            path2012.transition()
+                    .duration(1000)
+                    .attrTween("d", arcTween);
+            path2014 = svg2014.selectAll("g.arc")
+                              .select("path")
+                              .data(piedeath2014);
+            path2014.transition()
+                    .duration(1000)
+                    .attrTween("d", arcTween);
+            path2016 = svg2016.selectAll("g.arc")
+                              .select("path")
+                              .data(piedeath2016);
+            path2016.transition()
+                    .duration(1000)
+                    .attrTween("d", arcTween);
+          })
+
+            d3.select("#injury")
+              .on("click", function() {
+              path1998 = svg1998.selectAll("g.arc")
+                                .select("path")
+                                .data(pieinjury1998);
+              path1998.transition()
+                      .duration(1000)
+                      .attrTween("d", arcTween);
+              path2000 = svg2000.selectAll("g.arc")
+                                .select("path")
+                                .data(pieinjury2000);
+              path2000.transition()
+                      .duration(1000)
+                      .attrTween("d", arcTween);
+              path2002 = svg2002.selectAll("g.arc")
+                                .select("path")
+                                .data(pieinjury2002);
+              path2002.transition()
+                      .duration(1000)
+                      .attrTween("d", arcTween);
+              path2004 = svg2004.selectAll("g.arc")
+                                .select("path")
+                                .data(pieinjury2004);
+              path2004.transition()
+                      .duration(1000)
+                      .attrTween("d", arcTween);
+              path2006 = svg2006.selectAll("g.arc")
+                                .select("path")
+                                .data(pieinjury2006);
+              path2006.transition()
+                      .duration(1000)
+                      .attrTween("d", arcTween);
+              path2008 = svg2008.selectAll("g.arc")
+                                .select("path")
+                                .data(pieinjury2008);
+              path2008.transition()
+                      .duration(1000)
+                      .attrTween("d", arcTween);
+              path2010 = svg2010.selectAll("g.arc")
+                                .select("path")
+                                .data(pieinjury2010);
+              path2010.transition()
+                      .duration(1000)
+                      .attrTween("d", arcTween);
+              path2012 = svg2012.selectAll("g.arc")
+                                .select("path")
+                                .data(pieinjury2012);
+              path2012.transition()
+                      .duration(1000)
+                      .attrTween("d", arcTween);
+              path2014 = svg2014.selectAll("g.arc")
+                                .select("path")
+                                .data(pieinjury2014);
+              path2014.transition()
+                      .duration(1000)
+                      .attrTween("d", arcTween);
+              path2016 = svg2016.selectAll("g.arc")
+                                .select("path")
+                                .data(pieinjury2016);
+              path2016.transition()
+                      .duration(1000)
+                      .attrTween("d", arcTween);
+          }) })
+
+           function arcTween(a) {
+             var i = d3.interpolate(this._current, a);
+             this._current = i(0);
+             return function(t) { return arc(i(t)); };
+              }
+        </script>
+        </div>
+    </body>
+</html>

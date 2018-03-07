@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storm Events Portal</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!--<link rel="stylesheet" href="menustyle.css">-->
+
+    <script src="http://d3js.org/d3.v4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.0/d3-legend.min.js"></script>
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/portfolio-item.css" rel="stylesheet">
+    <style>
+    .axis.y { font-family: sans-serif;
+             font-size: 10px;
+             text-align: center;}
+    .axis.x { font-family: sans-serif;
+            font-size: 10px;
+            text-align: center;}
+    .label { font-family: sans-serif;
+             font-size: 11px;
+             text-align: center;
+             font-weight: bold; }
+    .barLabel { font-family: sans-serif;
+               font-size: 11px;
+               text-align: center;
+               text-anchor: middle;
+               fill: white;}
+
+    </style>
+
+
+</head>
+<body>
+
+<!--<div id='cssmenu'>-->
+    <!--<ul>-->
+        <!--<li class='active'><a href='index.html'>Home</a></li>-->
+        <!--<li><a href='bar-charts.html'>Yearly Event Count</a></li>-->
+        <!--<li><a href='donut_charts.html'>Yearly Event Stats</a></li>-->
+        <!--<li><a href="choropleth.html">Event Count by State</a></li>-->
+
+        <!--<li><a href='stream-charts.html'>Regional Event Count</a></li>-->
+    <!--</ul>-->
+<!--</div>-->
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">Storm Events Home</a>
+        <a class="navbar-brand" href="donut_charts.html">Event Intensity</a>
+        <a class="navbar-brand" href="slope-graph.html">Event Frequency</a>
+        <a class="navbar-brand" href="choropleth.html">Event Geography</a>
+        <a class="navbar-brand" href='stream-graphs.html'>Regional Event Impact</a>
+
+
+
+
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+    </div>
+</nav>
+
+<style>
+    .label { font-family: sans-serif;
+        font-size: 11px;
+        text-align: center;
+        font-weight: bold; }
+    .barLabel { font-family: sans-serif;
+        font-size: 11px;
+        text-align: center;
+        text-anchor: middle;
+        fill: white;}
+</style>
+
+<!-- Page Content -->
+<div class="container">
+
+    <!-- Portfolio Item Heading -->
+    <h1 class="my-4">Changing Storm Events
+        <small>Indication of Climate Change?</small>
+    </h1>
+
+    <!-- Portfolio Item Row -->
+    <div class="row md-12">
+
+        <div class="col-md-8 first">
+          <div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Select a Storm Event
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <a class="dropdown-item all" href="#">All Storm Events</a>
+    <a class="dropdown-item hurr" href="#">Hurricanes</a>
+    <a class="dropdown-item trop" href="#">Tropical Storms</a>
+    <a class="dropdown-item fire" href="#">Wildfires</a>
+    <a class="dropdown-item heat" href="#">Excessive Heat</a>
+  </div>
+</div>
+
+<div class="desc">Viewing: All Storm Events
+</div>
+            <!-- <button id= "all">All Weather Events</button>
+            <button id= "hurr">Hurricanes</button>
+            <button id= "trop">Tropical Storms</button>
+            <button id= "fire">Wildfires</button>
+            <button id= "heat">Excessive Heat</button>
+            </br> -->
+            <!-- <img class="img-fluid" src="http://placehold.it/750x500" alt=""> -->
+        </div>
+
+        <div class="col-md-4">
+            <h3 class="my-3">Climate Change</h3>
+            <p>Human activities lead to increased amounts of heat-trapping gases (Karl, 2009). This increase is associated with both an increase in temperatures and precipitation (Karl, 2009). Taken together, climate change describes these resulting increases from human activities. (Meehl et al., 2000).</p>
+            <h3 class="my-3">Storm Events</h3>
+            <p>The National Centers for Environmental Information (2017) defines storm events as weather patterns that exhibit behavior beyond what is normally expected for a geographic region. Since 1996 the National Weather Service has been tracking the frequency and intensity of many different storm events, including Hurricanes, Tropical Storms, Wildfires, and Extreme Heatwaves.</p>
+        </div>
+        <!-- <p>The Intergovernmental Panel on Climate Change (2014), alongside many researchers, forecast that climate change may be detectable in changing weather patterns. Both storm event frequency (number of occurances) and intesity (as measured by property damage, injuries, and fatalities) are hypothesized to increase as a result of climate change (Greenough et al., 2001).</p> -->
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <h3 class="my-3">Climate Change and Weather Events</h3>
+            <p>The Intergovernmental Panel on Climate Change (2014), alongside many researchers, forecast that climate change may be detectable in changing weather patterns. Both storm event frequency (number of occurances) and intesity (as measured by property damage, injuries, and fatalities) are hypothesized to increase as a result of climate change (Greenough et al., 2001).</p>
+            <h3 class="my-3">Evidence of Climate Change</h3>
+            <p>The National Weather Service has only been recording weather events other than tornados since 1996. Using the past 20 years as a sampling frame of weather events, a clear increasing trend for weather event frequency (bar chart above), or intensity (line chart to the right, <span style="color:rgb(139, 25, 24)"><b>red</b> </span> representing fatalities, <span style="color:#00345b"><b>blue</b></span> representing injuries, and <span style="color:green"><b>green</b></span> representing property damage) does not emerge.</p>
+
+            <!-- <h3 class="my-3">Climate Change</h3>
+            <p>Human activities lead to increased amounts of heat-trapping gases (Karl, 2009). This increase is associated with both an increase in temperatures and precipitation (Karl, 2009). Taken together, climate change describes this resulting increases from human activities. (Meehl et al., 2000).</p>
+            <h3 class="my-3">Storm Events</h3>
+            <p>The National Centers for Environmental Information (2017) defines storm events as weather patterns that exhibit behavior beyond what is normally expected for a geographic region. Since 1996 the National Weather Service has been tracking the frequency and intensity of many different storm events, including Hurricanes, Tropical Storms, Wildfires, and Extreme Heatwaves.</p> -->
+        </div>
+        <div class="col-md-8 second">
+            <!-- <button id= "occurance">Occurance</button>
+            <button id= "damage">Damage</button>
+            <button id= "death">Deaths</button>
+            <button id= "injury">Injuries</button> -->
+        </div>
+        <p>Data does not support strong indication of increase in storm event frequency or intensity. Looking at the attribution of fatalities, injuries, and damages by storm type may lend some additional information, as well as evaluating the events geospatially across the United States.</p>
+    </div>
+</div>
+    <!-- /.row -->
+
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+<script>
+d3.json("year_summaries_for_d3.json",function(data){
+console.log(data);
+// Define margins, width, and height for svg element
+createBarChart()
+// d3.select("body")
+//   .append("br");
+function createBarChart() {margin = {left: 75, right: 20, top: 20, bottom: 50},
+width = 750 - margin.left - margin.right,
+height = 500 - margin.top - margin.bottom;
+// Create and append svg element to the DOM
+svg = d3.select(".col-md-8.first")
+.append("svg")
+.attr("width", width + margin.left + margin.right)
+.attr("height", height + margin.top + margin.bottom)
+.append("g")
+.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+
+// Create scales for X and Y values
+xScale = d3.scaleBand()
+.domain(data.map(function(d) { return d.YEAR; }))
+.range([0,width])
+.padding(0.1);
+yScale = d3.scaleLinear()
+.domain([0, d3.max(data, function(d) { return d.TOTAL_COUNTS; })])
+.range([height, 0]);
+// Create and bind rectangles and labels for bar chart
+svg.selectAll("rect")
+.data(data, function (d) { return d.YEAR; })
+.enter()
+.append("rect")
+.attr("class", "bar")
+.attr("x", function(d) { return xScale(d.YEAR); })
+.attr("y", function(d) { return yScale(d.TOTAL_COUNTS); })
+.attr("width", xScale.bandwidth())
+.attr("height", function(d) { return height - yScale(d.TOTAL_COUNTS); })
+.attr("fill", "rgb(51, 0, 51)");
+svg.selectAll("text")
+.data(data)
+.enter()
+.append("text")
+.text(function(d){ return d.TOTAL_COUNTS; })
+.attr("x", function(d) { return xScale(d.YEAR) + xScale.bandwidth()/2; })
+.attr("y", function(d) { return yScale(d.TOTAL_COUNTS) + 20; })
+.attr("class", "barLabel");
+// Create x-axis and y-axis
+svg.append("g")
+.attr("class", "x axis")
+.attr("transform", "translate(0," + height + ")")
+.call(d3.axisBottom(xScale));
+    // .selectAll("text")
+    // // .attr("y", 0)
+    // // .attr("x", 9)
+    // .attr("dy", ".35em")
+    // // .attr("transform", "rotate(90)")
+    // .style("text-anchor", "start");
+svg.append("g")
+.attr("class", "y axis")
+.call(d3.axisLeft(yScale));
+// Create labels for x-axis and y-axis
+svg.append("text")
+.attr("class", "label")
+.attr("transform", "translate("+ (width/2) + ","+ (height + (margin.bottom-5)) + ")")
+.text("Year");
+svg.append("text")
+.attr("class", "label")
+.attr("transform", "translate("+ (0 - (margin.left/1.5)) +","+(height/1.40)+")rotate(-90)")
+.text("Number of Recorded Weather Events");
+// Create event listeners to change data from all events to specific events
+d3.select(".dropdown-item.all")
+.on("click", function() {
+yScale.domain([0, d3.max(data, function(d) { return d.TOTAL_COUNTS; })]);
+svg.selectAll("rect")
+.data(data)
+.transition()
+.delay(function(d, i) { return i * 75; })
+.duration(500)
+.attr("height", function(d) { return height - yScale(d.TOTAL_COUNTS); })
+.attr("fill", "rgb(51, 0, 51)")
+.attr("y", function(d) { return yScale(d.TOTAL_COUNTS); });
+svg.selectAll("text")
+.data(data)
+.transition()
+.delay(function(d, i) { return i * 75; })
+.duration(500)
+.text(function(d){ return d.TOTAL_COUNTS; })
+.attr("y", function(d) { return yScale(d.TOTAL_COUNTS) + 20; });
+svg.select(".y.axis")
+.transition()
+.duration(750)
+.call(d3.axisLeft(yScale));
+d3.select(".desc")
+  .transition()
+  .text("Viewing: All Storm Events");
+});
+d3.select(".dropdown-item.hurr")
+.on("click", function() {
+yScale.domain([0, d3.max(data, function(d) { return d.COUNT_HURRICANE; })]);
+svg.selectAll("rect")
+.data(data)
+.transition()
+.delay(function(d, i) { return i * 75; })
+.duration(500)
+.attr("height", function(d) { return height - yScale(d.COUNT_HURRICANE); })
+.attr("fill", "rgb(0, 52, 91)")
+.attr("y", function(d) { return yScale(d.COUNT_HURRICANE); });
+svg.selectAll("text")
+.data(data)
+.transition()
+.delay(function(d, i) { return i * 75; })
+.duration(500)
+.text(function(d){ return d.COUNT_HURRICANE; })
+.attr("y", function(d) { return yScale(d.COUNT_HURRICANE) + 20; });
+svg.select(".y.axis")
+.transition()
+.duration(750)
+.call(d3.axisLeft(yScale));
+d3.select(".desc")
+  .transition()
+  .text("Viewing: Hurricanes");
+}); };
+d3.select(".dropdown-item.trop")
+.on("click", function() {
+yScale.domain([0, d3.max(data, function(d) { return d.COUNT_TROPICAL; })]);
+svg.selectAll("rect")
+.data(data)
+.transition()
+.delay(function(d, i) { return i * 75; })
+.duration(500)
+.attr("height", function(d) { return height - yScale(d.COUNT_TROPICAL); })
+.attr("fill", "rgb(64, 129, 123)")
+.attr("y", function(d) { return yScale(d.COUNT_TROPICAL); });
+svg.selectAll("text")
+.data(data)
+.transition()
+.delay(function(d, i) { return i * 75; })
+.duration(500)
+.text(function(d){ return d.COUNT_TROPICAL; })
+.attr("y", function(d) { return yScale(d.COUNT_TROPICAL) + 20; });
+svg.select(".y.axis")
+.transition()
+.duration(750)
+.call(d3.axisLeft(yScale));
+d3.select(".desc")
+  .transition()
+  .text("Viewing: Tropical Storms");
+});
+d3.select(".dropdown-item.fire")
+.on("click", function() {
+yScale.domain([0, d3.max(data, function(d) { return d.COUNT_FIRE; })]);
+svg.selectAll("rect")
+.data(data)
+.transition()
+.delay(function(d, i) { return i * 75; })
+.duration(500)
+.attr("height", function(d) { return height - yScale(d.COUNT_FIRE); })
+.attr("fill", "rgb(248, 153, 33)")
+.attr("y", function(d) { return yScale(d.COUNT_FIRE); });
+svg.selectAll("text")
+.data(data)
+.transition()
+.delay(function(d, i) { return i * 75; })
+.duration(500)
+.text(function(d){ return d.COUNT_FIRE; })
+.attr("y", function(d) { return yScale(d.COUNT_FIRE) + 20; });
+svg.select(".y.axis")
+.transition()
+.duration(750)
+.call(d3.axisLeft(yScale));
+d3.select(".desc")
+  .transition()
+  .text("Viewing: Wildfires");
+});
+d3.select(".dropdown-item.heat")
+.on("click", function() {
+yScale.domain([0, d3.max(data, function(d) { return d.COUNT_HEAT; })]);
+svg.selectAll("rect")
+.data(data)
+.transition()
+.delay(function(d, i) { return i * 75; })
+.duration(500)
+.attr("height", function(d) { return height - yScale(d.COUNT_HEAT); })
+.attr("fill", "rgb(139, 25, 24)")
+.attr("y", function(d) { return yScale(d.COUNT_HEAT); });
+svg.selectAll("text")
+.data(data)
+.transition()
+.delay(function(d, i) { return i * 75; })
+.duration(500)
+.text(function(d){ return d.COUNT_HEAT; })
+.attr("y", function(d) { return yScale(d.COUNT_HEAT) + 20; });
+svg.select(".y.axis")
+.transition()
+.duration(750)
+.call(d3.axisLeft(yScale));
+d3.select(".desc")
+  .transition()
+  .text("Viewing: Excessive Heat");
+});
+});
+</script>
+<script type="text/javascript">
+var margin = {left: 75, right: 20, top: 20, bottom: 50},
+    width = 750 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+svg = d3.select(".col-md-8.second")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+var color = d3.scaleOrdinal()
+              .domain(["Total Fatalities", "Total Property Damage", "Total Injuries"])
+              .range(["#8b1918", "green", "#00345b"]);
+var legendOrdinal = d3.legendColor()
+                      .shape("path", d3.symbol().type(d3.symbolCircle).size(150)())
+                      .shapePadding(10)
+                      .scale(color);
+svg.append("g")
+          .attr("class", "legend")
+          .attr("transform", "translate(80,40)");
+svg.select(".legend")
+          .call(legendOrdinal);
+g = svg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+var x = d3.scaleLinear()
+    .range([0, width]);
+var y = d3.scaleLinear()
+    .rangeRound([height, 0]);
+var y1 = d3.scaleLinear()
+    .rangeRound([height, 0]);
+var y2 = d3.scaleLinear()
+    .rangeRound([height, 0]);
+var y3 = d3.scaleLinear()
+    .rangeRound([height, 0]);
+var line = d3.line()
+    .x(function(d) { return x(d.YEAR); })
+    .y(function(d) { return y(d.TOTAL_COUNTS); });
+var line2 = d3.line()
+    .x(function(d) { return x(d.YEAR); })
+    .y(function(d) { return y1(d.TOTAL_DEATHS); });
+var line3 = d3.line()
+    .x(function(d) { return x(d.YEAR); })
+    .y(function(d) { return y2(d.TOTAL_INJURIES); });
+var line4 = d3.line()
+    .x(function(d) { return x(d.YEAR); })
+    .y(function(d) { return y3(d.TOTAL_DAMAGE); });
+d3.json("year_summaries_for_d3.json", function(error, data) {
+    if (error) throw error;
+
+    x.domain(d3.extent(data, function(d) { return d.YEAR; }));
+    y.domain(d3.extent(data, function(d) { return d.TOTAL_COUNTS; }));
+
+    y1.domain(d3.extent(data, function(d) { return d.TOTAL_DEATHS; }));
+    y2.domain(d3.extent(data, function(d) { return d.TOTAL_INJURIES; }));
+    y3.domain(d3.extent(data, function(d) { return d.TOTAL_DAMAGE; }));
+    g.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x)
+            .tickFormat(d3.format(".0f")));
+    // g.append("g")
+    //     .call(d3.axisLeft(y))
+    //     .append("text")
+    //     .attr("fill", "#000")
+    //     .attr("transform", "rotate(-90)")
+    //     .attr("y", 6)
+    //     .attr("dy", "0.71em")
+    //     .attr("text-anchor", "end");
+
+    // g.append("path")
+    //     .datum(data)
+    //     .attr("fill", "none")
+    //     .attr("stroke", "steelblue")
+    //     .attr("stroke-linejoin", "round")
+    //     .attr("stroke-linecap", "round")
+    //     .attr("stroke-width", 3)
+    //     .attr("d", line);
+
+    g.append("path")
+        .datum(data)
+        .attr("fill", "none")
+        .attr("stroke", "rgb(139, 25, 24)")
+        .attr("stroke-linejoin", "round")
+        .attr("stroke-linecap", "round")
+        .attr("stroke-width", 3)
+        .attr("d", line2);
+
+    g.append("path")
+        .datum(data)
+        .attr("fill", "none")
+        .attr("stroke", "#00345b")
+        .attr("stroke-linejoin", "round")
+        .attr("stroke-linecap", "round")
+        .attr("stroke-width", 3)
+        .attr("d", line3);
+
+    g.append("path")
+        .datum(data)
+        .attr("fill", "none")
+        .attr("stroke", "green")
+        .attr("stroke-linejoin", "round")
+        .attr("stroke-linecap", "round")
+        .attr("stroke-width", 3)
+        .attr("d", line4);
+});
+</script>
+</html>

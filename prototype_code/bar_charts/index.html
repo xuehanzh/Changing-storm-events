@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>INF-554 Project</title>
+        <script src="http://d3js.org/d3.v4.min.js"></script>
+        <style>
+        body{font-family: sans-serif;}
+        .label { font-family: sans-serif;
+                 font-size: 11px;
+                 text-align: center;
+                 font-weight: bold; }
+        .barLabel { font-family: sans-serif;
+                   font-size: 11px;
+                   text-align: center;
+                   text-anchor: middle;
+                   fill: white;}
+        </style>
+    </head>
+    <body>
+        <h1>INF-554 Project</h1>
+        <p>Incidence of Weather Events by Year</p>
+        <button id= "all">All Weather Events</button>
+        <button id= "hurr">Hurricanes</button>
+        <button id= "trop">Tropical Storms</button>
+        <button id= "fire">Wildfires</button>
+        <button id= "heat">Excessive Heat</button>
+      </br>
+        <script type="text/javascript">
+        d3.json("year_summaries_for_d3.json",function(data){
+           console.log(data);
+           // Define margins, width, and height for svg element
+           createBarChart()
+           d3.select("body")
+             .append("br");
+           function createBarChart() {margin = {left: 75, right: 20, top: 20, bottom: 50},
+               width = 1000 - margin.left - margin.right,
+               height = 500 - margin.top - margin.bottom;
+           // Create and append svg element to the DOM
+           svg = d3.select("body")
+                       .append("svg")
+                       .attr("width", width + margin.left + margin.right)
+                       .attr("height", height + margin.top + margin.bottom)
+                       .append("g")
+                       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+           // Create scales for X and Y values
+           xScale = d3.scaleBand()
+                          .domain(data.map(function(d) { return d.YEAR; }))
+                          .range([0,width])
+                          .padding(0.1);
+           yScale = d3.scaleLinear()
+                          .domain([0, d3.max(data, function(d) { return d.TOTAL_COUNTS; })])
+                          .range([height, 0]);
+           // Create and bind rectangles and labels for bar chart
+           svg.selectAll("rect")
+              .data(data, function (d) { return d.YEAR; })
+              .enter()
+              .append("rect")
+              .attr("class", "bar")
+              .attr("x", function(d) { return xScale(d.YEAR); })
+              .attr("y", function(d) { return yScale(d.TOTAL_COUNTS); })
+              .attr("width", xScale.bandwidth())
+              .attr("height", function(d) { return height - yScale(d.TOTAL_COUNTS); })
+              .attr("fill", "rgb(51, 0, 51)");
+           svg.selectAll("text")
+              .data(data)
+              .enter()
+              .append("text")
+              .text(function(d){ return d.TOTAL_COUNTS; })
+              .attr("x", function(d) { return xScale(d.YEAR) + xScale.bandwidth()/2; })
+              .attr("y", function(d) { return yScale(d.TOTAL_COUNTS) + 20; })
+              .attr("class", "barLabel");
+          // Create x-axis and y-axis
+          svg.append("g")
+             .attr("class", "x axis")
+             .attr("transform", "translate(0," + height + ")")
+             .call(d3.axisBottom(xScale));
+          svg.append("g")
+             .attr("class", "y axis")
+             .call(d3.axisLeft(yScale));
+          // Create labels for x-axis and y-axis
+          svg.append("text")
+             .attr("class", "label")
+             .attr("transform", "translate("+ (width/2) + ","+ (height + (margin.bottom-5)) + ")")
+             .text("Year");
+          svg.append("text")
+             .attr("class", "label")
+             .attr("transform", "translate("+ (0 - (margin.left/1.5)) +","+(height/1.40)+")rotate(-90)")
+             .text("Number of Recorded Weather Events");
+          // Create event listeners to change data from all events to specific events
+          d3.select("#all")
+            .on("click", function() {
+           yScale.domain([0, d3.max(data, function(d) { return d.TOTAL_COUNTS; })]);
+           svg.selectAll("rect")
+              .data(data)
+              .transition()
+              .delay(function(d, i) { return i * 75; })
+              .duration(500)
+              .attr("height", function(d) { return height - yScale(d.TOTAL_COUNTS); })
+              .attr("fill", "rgb(51, 0, 51)")
+              .attr("y", function(d) { return yScale(d.TOTAL_COUNTS); });
+           svg.selectAll("text")
+              .data(data)
+              .transition()
+              .delay(function(d, i) { return i * 75; })
+              .duration(500)
+              .text(function(d){ return d.TOTAL_COUNTS; })
+              .attr("y", function(d) { return yScale(d.TOTAL_COUNTS) + 20; });
+           svg.select(".y.axis")
+              .transition()
+              .duration(750)
+              .call(d3.axisLeft(yScale));
+         });
+         d3.select("#hurr")
+           .on("click", function() {
+           yScale.domain([0, d3.max(data, function(d) { return d.COUNT_HURRICANE; })]);
+           svg.selectAll("rect")
+              .data(data)
+              .transition()
+              .delay(function(d, i) { return i * 75; })
+              .duration(500)
+              .attr("height", function(d) { return height - yScale(d.COUNT_HURRICANE); })
+              .attr("fill", "rgb(0, 52, 91)")
+              .attr("y", function(d) { return yScale(d.COUNT_HURRICANE); });
+           svg.selectAll("text")
+              .data(data)
+              .transition()
+              .delay(function(d, i) { return i * 75; })
+              .duration(500)
+              .text(function(d){ return d.COUNT_HURRICANE; })
+              .attr("y", function(d) { return yScale(d.COUNT_HURRICANE) + 20; });
+           svg.select(".y.axis")
+              .transition()
+              .duration(750)
+              .call(d3.axisLeft(yScale));
+         }); };
+         d3.select("#trop")
+           .on("click", function() {
+           yScale.domain([0, d3.max(data, function(d) { return d.COUNT_TROPICAL; })]);
+           svg.selectAll("rect")
+              .data(data)
+              .transition()
+              .delay(function(d, i) { return i * 75; })
+              .duration(500)
+              .attr("height", function(d) { return height - yScale(d.COUNT_TROPICAL); })
+              .attr("fill", "rgb(64, 129, 123)")
+              .attr("y", function(d) { return yScale(d.COUNT_TROPICAL); });
+           svg.selectAll("text")
+              .data(data)
+              .transition()
+              .delay(function(d, i) { return i * 75; })
+              .duration(500)
+              .text(function(d){ return d.COUNT_TROPICAL; })
+              .attr("y", function(d) { return yScale(d.COUNT_TROPICAL) + 20; });
+           svg.select(".y.axis")
+             .transition()
+             .duration(750)
+             .call(d3.axisLeft(yScale));
+         });
+         d3.select("#fire")
+           .on("click", function() {
+           yScale.domain([0, d3.max(data, function(d) { return d.COUNT_FIRE; })]);
+           svg.selectAll("rect")
+              .data(data)
+              .transition()
+              .delay(function(d, i) { return i * 75; })
+              .duration(500)
+              .attr("height", function(d) { return height - yScale(d.COUNT_FIRE); })
+              .attr("fill", "rgb(248, 153, 33)")
+              .attr("y", function(d) { return yScale(d.COUNT_FIRE); });
+           svg.selectAll("text")
+              .data(data)
+              .transition()
+              .delay(function(d, i) { return i * 75; })
+              .duration(500)
+              .text(function(d){ return d.COUNT_FIRE; })
+              .attr("y", function(d) { return yScale(d.COUNT_FIRE) + 20; });
+           svg.select(".y.axis")
+             .transition()
+             .duration(750)
+             .call(d3.axisLeft(yScale));
+         });
+         d3.select("#heat")
+           .on("click", function() {
+           yScale.domain([0, d3.max(data, function(d) { return d.COUNT_HEAT; })]);
+           svg.selectAll("rect")
+              .data(data)
+              .transition()
+              .delay(function(d, i) { return i * 75; })
+              .duration(500)
+              .attr("height", function(d) { return height - yScale(d.COUNT_HEAT); })
+              .attr("fill", "rgb(139, 25, 24)")
+              .attr("y", function(d) { return yScale(d.COUNT_HEAT); });
+           svg.selectAll("text")
+              .data(data)
+              .transition()
+              .delay(function(d, i) { return i * 75; })
+              .duration(500)
+              .text(function(d){ return d.COUNT_HEAT; })
+              .attr("y", function(d) { return yScale(d.COUNT_HEAT) + 20; });
+           svg.select(".y.axis")
+             .transition()
+             .duration(750)
+             .call(d3.axisLeft(yScale));
+         });
+         });
+        </script>
+    </body>
+</html>
